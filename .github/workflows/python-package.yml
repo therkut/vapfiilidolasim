@@ -1,0 +1,60 @@
+name: Vap Daily Report
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout
+      - uses: actions/checkout@v3
+
+      # Clean data directory
+      - name: Clean data directory
+        run: |
+          mkdir -p data
+          find data -type f -exec rm -f {} \;
+
+      # Set up Python
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # Cache pip packages
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install selenium pandas openpyxl requests webdriver-manager xlrd
+
+      # Run Selenium script
+      - name: Run VAP Selenium Script
+        run: python vap.py
+
+      # List files
+      - name: List generated files
+        run: ls -lh data/
+
+      # Commit & push
+      - name: Commit and push results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/*.xlsx data/*.html || echo "No files to add"
+          git commit -m "📊 Daily VAP report: $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push

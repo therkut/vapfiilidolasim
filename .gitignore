@@ -1,0 +1,5 @@
+# Selenium geçici dosyaları
+data/.com.google.*
+
+# Tarayıcı profilleri
+chrome-profile/
