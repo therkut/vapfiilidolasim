@@ -75,7 +75,11 @@ def wait_for_download(download_dir, timeout=10):
 
 # === EXCEL İNDİRME ===
 def download_excel(date_str):
-    clear_old_downloads(DATA_DIR)
+    # Hafta sonu değilse eski dosyaları temizle
+    today = datetime.today()
+    weekday = today.weekday()
+    if weekday < 5:  # 0-4 = Pazartesi-Cuma
+        clear_old_downloads(DATA_DIR)
     driver = setup_driver()
     try:
         driver.get(URL_FORM)
