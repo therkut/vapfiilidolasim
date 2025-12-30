@@ -2,7 +2,7 @@ name: Vap Daily Report
 
 on:
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '0 6 * * 2,5'
   workflow_dispatch:
 
 permissions:
@@ -58,3 +58,4 @@ jobs:
           git add data/*.xlsx data/*.html || echo "No files to add"
           git commit -m "📊 Daily VAP report: $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
           git push
+
